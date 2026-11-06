@@ -56,11 +56,11 @@ void AttachmentService::validate(const UploadRequest& req) {
 UploadResult AttachmentService::upload(const UploadRequest& req) {
     validate(req);
 
-    // 1. Кладём в S3
+    // Кладём в S3
     StoredObject obj = storage_->put(req.original_name, *req.stream,
                                      req.size_bytes);
 
-    // 2. Метаданные
+    // Метаданные
     Attachment a;
     a.id              = kb::common::generate_uuid();
     a.page_id         = req.page_id;
@@ -72,10 +72,10 @@ UploadResult AttachmentService::upload(const UploadRequest& req) {
     a.uploaded_by     = req.user_id;
     a.uploaded_at     = std::chrono::system_clock::now();
 
-    // 3. Транзакция: метаданные
+    // Транзакция: метаданные
     repo_->create(a);
 
-    // 4. Извлекаем текст и сохраняем в индекс (Postgres + Manticore)
+    // Извлекаем текст и сохраняем в индекс (Postgres + Manticore)
     auto stream = storage_->get(a.storage_key);
     index_attachment(a.id, a.original_name, a.mime_type, *stream);
 
@@ -111,13 +111,13 @@ void AttachmentService::remove(const AttachmentId& id) {
     auto meta = repo_->find(id);
     if (!meta) throw AttachmentError(ErrorCode::NotFound, "attachment not found");
 
-    // 1. Удаляем из S3
+    // Удаляем из S3
     storage_->remove(meta->storage_key);
 
-    // 2. Удаляем метаданные из Postgres
+    // Удаляем метаданные из Postgres
     repo_->remove(id);
 
-    // 3. Удаляем из Manticore Search
+    // Удаляем из Manticore Search
     search_index_->remove(id);
 }
 
