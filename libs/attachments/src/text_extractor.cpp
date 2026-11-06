@@ -62,7 +62,7 @@ std::string extract_text(const std::string& filename,
                          const std::string& mime_type,
                          std::istream& data) {
 
-    // 1. Текстовые файлы
+    //Текстовые файлы
     if (mime_type == "text/plain" || mime_type == "text/markdown") {
         std::ostringstream ss;
         ss << data.rdbuf();
@@ -73,7 +73,7 @@ std::string extract_text(const std::string& filename,
     std::string binary_data((std::istreambuf_iterator<char>(data)),
                              std::istreambuf_iterator<char>());
 
-    // 2. PDF
+    // PDF
     if (mime_type == "application/pdf") {
         std::unique_ptr<poppler::document> doc(
             poppler::document::load_from_raw_data(binary_data.data(), binary_data.size())
@@ -93,7 +93,7 @@ std::string extract_text(const std::string& filename,
         return full_text;
     }
 
-    // 3. DOCX
+    // DOCX
     if (mime_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
         return extract_docx(binary_data);
     }
